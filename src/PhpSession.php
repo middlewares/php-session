@@ -58,13 +58,7 @@ class PhpSession implements ServerMiddlewareInterface
      */
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        if (session_status() === PHP_SESSION_DISABLED) {
-            throw new RuntimeException('PHP sessions are disabled');
-        }
-
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            throw new RuntimeException('Failed to start the session: already started by PHP.');
-        }
+        self::checkSessionCanStart();
 
         //Session name
         $name = $this->name ?: session_name();
@@ -94,5 +88,21 @@ class PhpSession implements ServerMiddlewareInterface
         }
 
         return $response;
+    }
+
+    /**
+     * Checks whether the session can be started.
+     *
+     * @throws RuntimeException
+     */
+    private static function checkSessionCanStart()
+    {
+        if (session_status() === PHP_SESSION_DISABLED) {
+            throw new RuntimeException('PHP sessions are disabled');
+        }
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            throw new RuntimeException('Failed to start the session: already started by PHP.');
+        }
     }
 }
