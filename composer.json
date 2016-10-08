@@ -1,7 +1,7 @@
 {
     "name": "middlewares/php-session",
     "type": "library",
-    "description": "Middleware to create a php session using the request data",
+    "description": "Middleware to start php sessions using the request data",
     "license": "MIT",
     "keywords": [
         "psr-7",

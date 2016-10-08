@@ -7,7 +7,7 @@
 [![Total Downloads][ico-downloads]][link-downloads]
 [![SensioLabs Insight][ico-sensiolabs]][link-sensiolabs]
 
-Middleware to initialize a [php session](http://php.net/manual/en/book.session.php) using the request data and close it after return the response.
+Middleware to start a [php session](http://php.net/manual/en/book.session.php) using the request data and close it after return the response.
 
 **Note:** This middleware is intended for server side only
 
