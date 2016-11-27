@@ -3,9 +3,10 @@
 namespace Middlewares\Tests;
 
 use Middlewares\PhpSession;
+use Middlewares\Utils\Dispatcher;
+use Middlewares\Utils\CallableMiddleware;
 use Zend\Diactoros\ServerRequest;
 use Zend\Diactoros\Response;
-use mindplay\middleman\Dispatcher;
 
 class PhpSessionTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,14 +30,14 @@ class PhpSessionTest extends \PHPUnit_Framework_TestCase
     {
         $response = (new Dispatcher([
             (new PhpSession())->name($sessionName),
-            function ($request) use ($value) {
+            new CallableMiddleware(function ($request) use ($value) {
                 $response = new Response();
 
                 $response->getBody()->write(session_name());
                 $_SESSION['name'] = $value;
 
                 return $response;
-            },
+            }),
         ]))->dispatch(new ServerRequest());
 
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
