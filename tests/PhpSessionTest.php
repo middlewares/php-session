@@ -4,9 +4,7 @@ namespace Middlewares\Tests;
 
 use Middlewares\PhpSession;
 use Middlewares\Utils\Dispatcher;
-use Middlewares\Utils\CallableMiddleware;
-use Zend\Diactoros\ServerRequest;
-use Zend\Diactoros\Response;
+use Middlewares\Utils\Factory;
 
 class PhpSessionTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,17 +26,16 @@ class PhpSessionTest extends \PHPUnit_Framework_TestCase
      */
     public function testPhpSession($sessionName, $value)
     {
+        $request = Factory::createServerRequest();
+
         $response = (new Dispatcher([
             (new PhpSession())->name($sessionName),
-            new CallableMiddleware(function ($request) use ($value) {
-                $response = new Response();
+            function ($request) use ($value) {
+                echo session_name();
 
-                $response->getBody()->write(session_name());
                 $_SESSION['name'] = $value;
-
-                return $response;
-            }),
-        ]))->dispatch(new ServerRequest());
+            },
+        ]))->dispatch($request);
 
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
 
