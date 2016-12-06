@@ -4,7 +4,6 @@ namespace Middlewares\Tests;
 
 use Middlewares\PhpSession;
 use Middlewares\Utils\Dispatcher;
-use Middlewares\Utils\Factory;
 
 class PhpSessionTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,16 +25,14 @@ class PhpSessionTest extends \PHPUnit_Framework_TestCase
      */
     public function testPhpSession($sessionName, $value)
     {
-        $request = Factory::createServerRequest();
-
-        $response = (new Dispatcher([
+        $response = Dispatcher::run([
             (new PhpSession())->name($sessionName),
             function ($request) use ($value) {
                 echo session_name();
 
                 $_SESSION['name'] = $value;
             },
-        ]))->dispatch($request);
+        ]);
 
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
 
