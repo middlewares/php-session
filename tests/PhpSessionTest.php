@@ -34,8 +34,6 @@ class PhpSessionTest extends \PHPUnit_Framework_TestCase
             },
         ]);
 
-        $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
-
         $this->assertEquals($sessionName, (string) $response->getBody());
         $this->assertEquals($value, $_SESSION['name']);
     }

@@ -48,6 +48,10 @@ The session name. If it's not provided, use the php's default
 
 The session id. If it's not provided, try to get it from the request's cookies.
 
+#### `options(array $options)`
+
+Array of options passed to `session_start()` [(only php7, more info)](http://php.net/manual/en/migration70.new-features.php#migration70.new-features.session-options)
+
 ---
 
 Please see [CHANGELOG](CHANGELOG.md) for more information about recent changes and [CONTRIBUTING](CONTRIBUTING.md) for contributing details.

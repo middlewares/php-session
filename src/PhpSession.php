@@ -21,6 +21,11 @@ class PhpSession implements MiddlewareInterface
     private $id;
 
     /**
+     * @var array|null
+     */
+    private $options;
+
+    /**
      * Configure the session name.
      *
      * @param string $name
@@ -44,6 +49,20 @@ class PhpSession implements MiddlewareInterface
     public function id($id)
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Set the session options.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function options(array $options)
+    {
+        $this->options = $options;
 
         return $this;
     }
@@ -79,7 +98,11 @@ class PhpSession implements MiddlewareInterface
             session_id($id);
         }
 
-        session_start();
+        if ($this->options === null) {
+            session_start();
+        } else {
+            session_start($this->options);
+        }
 
         $response = $delegate->process($request);
 
