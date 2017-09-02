@@ -22,6 +22,7 @@ class PhpSessionTest extends TestCase
     }
 
     /**
+     * @runInSeparateProcess
      * @dataProvider sessionDataProvider
      * @param mixed $sessionName
      * @param mixed $value
