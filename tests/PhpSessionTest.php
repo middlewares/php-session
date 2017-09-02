@@ -2,10 +2,11 @@
 
 namespace Middlewares\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Middlewares\PhpSession;
 use Middlewares\Utils\Dispatcher;
 
-class PhpSessionTest extends \PHPUnit_Framework_TestCase
+class PhpSessionTest extends TestCase
 {
     public function sessionDataProvider()
     {
