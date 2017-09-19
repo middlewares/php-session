@@ -2,8 +2,8 @@
 
 namespace Middlewares;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use Interop\Http\Server\MiddlewareInterface;
+use Interop\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
@@ -70,12 +70,12 @@ class PhpSession implements MiddlewareInterface
     /**
      * Process a server request and return a response.
      *
-     * @param ServerRequestInterface $request
-     * @param DelegateInterface      $delegate
+     * @param ServerRequestInterface  $request
+     * @param RequestHandlerInterface $handler
      *
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler)
     {
         self::checkSessionCanStart();
 
@@ -104,7 +104,7 @@ class PhpSession implements MiddlewareInterface
             session_start($this->options);
         }
 
-        $response = $delegate->process($request);
+        $response = $handler->handle($request);
 
         if ((session_status() === PHP_SESSION_ACTIVE) && (session_name() === $name)) {
             session_write_close();
