@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Middlewares;
 
@@ -27,12 +28,8 @@ class PhpSession implements MiddlewareInterface
 
     /**
      * Configure the session name.
-     *
-     * @param string $name
-     *
-     * @return self
      */
-    public function name($name)
+    public function name(string $name): self
     {
         $this->name = $name;
 
@@ -41,12 +38,8 @@ class PhpSession implements MiddlewareInterface
 
     /**
      * Configure the session id.
-     *
-     * @param string $id
-     *
-     * @return self
      */
-    public function id($id)
+    public function id(string $id): self
     {
         $this->id = $id;
 
@@ -55,12 +48,8 @@ class PhpSession implements MiddlewareInterface
 
     /**
      * Set the session options.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function options(array $options)
+    public function options(array $options): self
     {
         $this->options = $options;
 
@@ -69,13 +58,8 @@ class PhpSession implements MiddlewareInterface
 
     /**
      * Process a server request and return a response.
-     *
-     * @param ServerRequestInterface  $request
-     * @param RequestHandlerInterface $handler
-     *
-     * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         self::checkSessionCanStart();
 
