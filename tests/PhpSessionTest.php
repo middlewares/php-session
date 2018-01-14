@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Middlewares\Tests;
 
@@ -8,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class PhpSessionTest extends TestCase
 {
-    public function sessionDataProvider()
+    public function sessionDataProvider(): array
     {
         return [
             [
@@ -24,19 +25,20 @@ class PhpSessionTest extends TestCase
     /**
      * @runInSeparateProcess
      * @dataProvider sessionDataProvider
-     * @param mixed $sessionName
-     * @param mixed $value
      */
-    public function testPhpSession($sessionName, $value)
+    public function testPhpSession(string $sessionName, string $value)
     {
-        $response = Dispatcher::run([
-            (new PhpSession())->name($sessionName),
-            function ($request) use ($value) {
-                echo session_name();
+        $response = Dispatcher::run(
+            [
+                (new PhpSession())->name($sessionName),
 
-                $_SESSION['name'] = $value;
-            },
-        ]);
+                function ($request) use ($value) {
+                    echo session_name();
+
+                    $_SESSION['name'] = $value;
+                },
+            ]
+        );
 
         $this->assertEquals($sessionName, (string) $response->getBody());
         $this->assertEquals($value, $_SESSION['name']);
