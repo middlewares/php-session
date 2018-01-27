@@ -30,7 +30,12 @@ class PhpSessionTest extends TestCase
     {
         $response = Dispatcher::run(
             [
-                (new PhpSession())->name($sessionName),
+                (new PhpSession())
+                    ->name($sessionName)
+                    ->options([
+                        'use_cookies' => false,
+                        'use_only_cookies' => true,
+                    ]),
 
                 function ($request) use ($value) {
                     echo session_name();
