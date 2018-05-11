@@ -29,12 +29,12 @@ class PhpSession implements MiddlewareInterface
     /**
      * @var int|null
      */
-    private $lifetime;
+    private $regenerateIdInterval;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $lifetimeSessionKey = 'session-lifetime';
+    private $sessionIdExpiryKey;
 
 
     /**
@@ -68,21 +68,13 @@ class PhpSession implements MiddlewareInterface
     }
 
     /**
-     * Set the session lifetime.
+     * Set the session id regenerate interval and id expiry key name.
      */
-    public function lifetime(int $lifetime): self
+    public function regenerateId(int $interval, string $key = 'session-id-expires'): self
     {
-        $this->lifetime = $lifetime;
+        $this->regenerateIdInterval = $interval;
 
-        return $this;
-    }
-
-    /**
-     * Set the session lifetime key used in $_SESSION.
-     */
-    public function lifetimeSessionKey(string $lifetimeSessionKey): self
-    {
-        $this->lifetimeSessionKey = $lifetimeSessionKey;
+        $this->sessionIdExpiryKey = $key;
 
         return $this;
     }
@@ -119,20 +111,21 @@ class PhpSession implements MiddlewareInterface
             session_start($this->options);
         }
 
-        // Session lifetime
-        $lifetime = $this->lifetime;
+        // Session Id regeneration
+        $interval = $this->regenerateIdInterval ?: 0;
 
-        if (!empty($lifetime)) {
-            $key = $this->lifetimeSessionKey;
+        if ($interval) {
+            $key = $this->sessionIdExpiryKey;
+            $expiry = time() + $interval;
 
             if (!isset($_SESSION[$key])) {
-                $_SESSION[$key] = time() + $lifetime;
+                $_SESSION[$key] = $expiry;
             }
 
-            if ($_SESSION[$key] < time()) {
+            if ($_SESSION[$key] < time() || $_SESSION[$key] > $expiry) {
                 session_regenerate_id(true);
 
-                $_SESSION[$key] = time() + $lifetime;
+                $_SESSION[$key] = $expiry;
             }
         }
 

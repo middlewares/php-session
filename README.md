@@ -52,13 +52,11 @@ The session id. If it's not provided, try to get it from the request's cookies.
 
 Array of options passed to `session_start()` [(only php7, more info)](http://php.net/manual/en/migration70.new-features.php#migration70.new-features.session-options)
 
-### `lifetime(int $lifetime)`
+### `regenerateId(int $interval, string $key = 'session-id-expires')`
 
-The session lifetime, which is number of seconds before the session ID will be regenerated. If it's not provided, sesson ID will remain unchanged.
+The session id regeneration interval in seconds. If 0 or it's not provided, sesson ID will remain unchanged.
 
-### `lifetimeSessionKey(string $lifetimeSessionKey)`
-
-The name of the key to use to store the created time of the session to use to check againist the session lifetime.
+The session id expiry timestamp key name.
 
 ---
 
