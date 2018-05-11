@@ -27,6 +27,17 @@ class PhpSession implements MiddlewareInterface
     private $options;
 
     /**
+     * @var int|null
+     */
+    private $lifetime;
+
+    /**
+     * @var string
+     */
+    private $lifetimeSessionKey = 'session-lifetime';
+
+
+    /**
      * Configure the session name.
      */
     public function name(string $name): self
@@ -52,6 +63,26 @@ class PhpSession implements MiddlewareInterface
     public function options(array $options): self
     {
         $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * Set the session lifetime.
+     */
+    public function lifetime(int $lifetime): self
+    {
+        $this->lifetime = $lifetime;
+
+        return $this;
+    }
+
+    /**
+     * Set the session lifetime key used in $_SESSION.
+     */
+    public function lifetimeSessionKey(string $lifetimeSessionKey): self
+    {
+        $this->lifetimeSessionKey = $lifetimeSessionKey;
 
         return $this;
     }
@@ -86,6 +117,23 @@ class PhpSession implements MiddlewareInterface
             session_start();
         } else {
             session_start($this->options);
+        }
+
+        // Session lifetime
+        $lifetime = $this->lifetime;
+
+        if (!empty($lifetime)) {
+            $key = $this->lifetimeSessionKey;
+
+            if (!isset($_SESSION[$key])) {
+                $_SESSION[$key] = time() + $lifetime;
+            }
+
+            if ($_SESSION[$key] < time()) {
+                session_regenerate_id(true);
+
+                $_SESSION[$key] = time() + $lifetime;
+            }
         }
 
         $response = $handler->handle($request);
