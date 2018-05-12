@@ -27,6 +27,17 @@ class PhpSession implements MiddlewareInterface
     private $options;
 
     /**
+     * @var int|null
+     */
+    private $regenerateIdInterval;
+
+    /**
+     * @var string|null
+     */
+    private $sessionIdExpiryKey;
+
+
+    /**
      * Configure the session name.
      */
     public function name(string $name): self
@@ -52,6 +63,18 @@ class PhpSession implements MiddlewareInterface
     public function options(array $options): self
     {
         $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * Set the session id regenerate interval and id expiry key name.
+     */
+    public function regenerateId(int $interval, string $key = 'session-id-expires'): self
+    {
+        $this->regenerateIdInterval = $interval;
+
+        $this->sessionIdExpiryKey = $key;
 
         return $this;
     }
@@ -86,6 +109,24 @@ class PhpSession implements MiddlewareInterface
             session_start();
         } else {
             session_start($this->options);
+        }
+
+        // Session Id regeneration
+        $interval = $this->regenerateIdInterval ?: 0;
+
+        if ($interval) {
+            $key = $this->sessionIdExpiryKey;
+            $expiry = time() + $interval;
+
+            if (!isset($_SESSION[$key])) {
+                $_SESSION[$key] = $expiry;
+            }
+
+            if ($_SESSION[$key] < time() || $_SESSION[$key] > $expiry) {
+                session_regenerate_id(true);
+
+                $_SESSION[$key] = $expiry;
+            }
         }
 
         $response = $handler->handle($request);
