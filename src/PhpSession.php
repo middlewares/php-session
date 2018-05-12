@@ -112,22 +112,7 @@ class PhpSession implements MiddlewareInterface
         }
 
         // Session Id regeneration
-        $interval = $this->regenerateIdInterval ?: 0;
-
-        if ($interval) {
-            $key = $this->sessionIdExpiryKey;
-            $expiry = time() + $interval;
-
-            if (!isset($_SESSION[$key])) {
-                $_SESSION[$key] = $expiry;
-            }
-
-            if ($_SESSION[$key] < time() || $_SESSION[$key] > $expiry) {
-                session_regenerate_id(true);
-
-                $_SESSION[$key] = $expiry;
-            }
-        }
+        self::runIdRegeneration($this->regenerateIdInterval, $this->sessionIdExpiryKey);
 
         $response = $handler->handle($request);
 
@@ -151,6 +136,28 @@ class PhpSession implements MiddlewareInterface
 
         if (session_status() === PHP_SESSION_ACTIVE) {
             throw new RuntimeException('Failed to start the session: already started by PHP.');
+        }
+    }
+
+    /**
+     * Regenerate the session id if it's needed
+     */
+    private static function runIdRegeneration(int $interval = null, string $key = null)
+    {
+        if (empty($interval)) {
+            return;
+        }
+
+        $expiry = time() + $interval;
+
+        if (!isset($_SESSION[$key])) {
+            $_SESSION[$key] = $expiry;
+        }
+
+        if ($_SESSION[$key] < time() || $_SESSION[$key] > $expiry) {
+            session_regenerate_id(true);
+
+            $_SESSION[$key] = $expiry;
         }
     }
 }
