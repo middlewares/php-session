@@ -12,7 +12,7 @@ Middleware to start a [php session](http://php.net/manual/en/book.session.php) u
 ## Requirements
 
 * PHP >= 7.0
-* A [PSR-7](https://packagist.org/providers/psr/http-message-implementation) http message implementation ([Diactoros](https://github.com/zendframework/zend-diactoros), [Guzzle](https://github.com/guzzle/psr7), [Slim](https://github.com/slimphp/Slim), etc...)
+* A [PSR-7 http message implementation](https://github.com/middlewares/awesome-psr15-middlewares#psr-7-implementations)
 * A [PSR-15 middleware dispatcher](https://github.com/middlewares/awesome-psr15-middlewares#dispatcher)
 
 ## Installation
@@ -50,11 +50,11 @@ The session id. If it's not provided, try to get it from the request's cookies.
 
 #### `options(array $options)`
 
-Array of options passed to `session_start()` [(only php7, more info)](http://php.net/manual/en/migration70.new-features.php#migration70.new-features.session-options)
+Array of options passed to [`session_start()`](http://php.net/session_start)
 
 ### `regenerateId(int $interval, string $key = 'session-id-expires')`
 
-The session id regeneration interval in seconds. If 0 or it's not provided, sesson ID will remain unchanged.
+The session id regeneration interval in seconds. If it's 0 or not provided, sesson ID will remain unchanged.
 
 The session id expiry timestamp key name.
 
