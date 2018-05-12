@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.1.0] - 2018-05-11
+## [1.1.0] - 2018-05-12
 
 ### Added
 
-- New function `regenerateId` to regenerate session IDs after a given interval
+- New function `regenerateId` to regenerate session IDs after a given interval [#2]
 
 ## [1.0.0] - 2018-01-27
 
@@ -69,6 +69,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First version
 
+[#2]: https://github.com/middlewares/php-session/issues/2
+
+[1.1.0]: https://github.com/middlewares/php-session/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/middlewares/php-session/compare/v0.6.0...v1.0.0
 [0.6.0]: https://github.com/middlewares/php-session/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/middlewares/php-session/compare/v0.4.0...v0.5.0
