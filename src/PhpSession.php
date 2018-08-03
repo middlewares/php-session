@@ -36,7 +36,6 @@ class PhpSession implements MiddlewareInterface
      */
     private $sessionIdExpiryKey;
 
-
     /**
      * Configure the session name.
      */
