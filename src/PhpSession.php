@@ -127,7 +127,7 @@ class PhpSession implements MiddlewareInterface
      *
      * @throws RuntimeException
      */
-    private static function checkSessionCanStart()
+    private static function checkSessionCanStart(): void
     {
         if (session_status() === PHP_SESSION_DISABLED) {
             throw new RuntimeException('PHP sessions are disabled');
@@ -141,7 +141,7 @@ class PhpSession implements MiddlewareInterface
     /**
      * Regenerate the session id if it's needed
      */
-    private static function runIdRegeneration(int $interval = null, string $key = null)
+    private static function runIdRegeneration(int $interval = null, string $key = null): void
     {
         if (empty($interval)) {
             return;
