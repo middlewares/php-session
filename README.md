@@ -5,13 +5,12 @@
 [![Build Status][ico-travis]][link-travis]
 [![Quality Score][ico-scrutinizer]][link-scrutinizer]
 [![Total Downloads][ico-downloads]][link-downloads]
-[![SensioLabs Insight][ico-sensiolabs]][link-sensiolabs]
 
 Middleware to start a [php session](http://php.net/manual/en/book.session.php) using the request data and close it after return the response.
 
 ## Requirements
 
-* PHP >= 7.0
+* PHP >= 7.2
 * A [PSR-7 http message implementation](https://github.com/middlewares/awesome-psr15-middlewares#psr-7-implementations)
 * A [PSR-15 middleware dispatcher](https://github.com/middlewares/awesome-psr15-middlewares#dispatcher)
 
@@ -26,7 +25,7 @@ composer require middlewares/php-session
 ## Example
 
 ```php
-$dispatcher = new Dispatcher([
+Dispatcher::run([
 	new Middlewares\PhpSession(),
 
     function () {
@@ -34,29 +33,54 @@ $dispatcher = new Dispatcher([
         $_SESSION['name'] = 'John';
     }
 ]);
-
-$response = $dispatcher->dispatch(new ServerRequest());
 ```
 
-## Options
+## Usage
 
-#### `name(string $name)`
+This is a middleware to start the native PHP session using the cookies of the server request.
 
-The session name. If it's not provided, use the php's default
+### name
 
-#### `id(string $id)`
+The session name. If it's not provided, use the php's default (PHPSESSID). More info [session_name](https://www.php.net/manual/en/function.session-name.php)
+
+```php
+// Start the session with other name
+$session = (new Middlewares\PhpSession())->name('user_session');
+```
+
+### id
 
 The session id. If it's not provided, try to get it from the request's cookies.
 
-#### `options(array $options)`
+```php
+// Start the session with a specific session id
+$session = (new Middlewares\PhpSession())->id('foo');
+```
+
+### options
 
 Array of options passed to [`session_start()`](http://php.net/session_start)
 
-### `regenerateId(int $interval, string $key = 'session-id-expires')`
+```php
+// Start the session with a specific session id
+$session = (new Middlewares\PhpSession())->options([
+    'cookie_lifetime' => 86400
+]);
+```
+
+### regenerateId
 
 The session id regeneration interval in seconds. If it's 0 or not provided, sesson ID will remain unchanged.
 
 The session id expiry timestamp key name.
+
+```php
+// Regenerate the session id after 60 seconds
+$session = (new Middlewares\PhpSession())->regenerateId(60);
+
+// Regenerate the session id after 60 seconds, storing the expires date in the key 'expiresAt'
+$session = (new Middlewares\PhpSession())->regenerateId(60, 'expiresAt');
+```
 
 ---
 
@@ -69,10 +93,8 @@ The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
 [ico-travis]: https://img.shields.io/travis/middlewares/php-session/master.svg?style=flat-square
 [ico-scrutinizer]: https://img.shields.io/scrutinizer/g/middlewares/php-session.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/middlewares/php-session.svg?style=flat-square
-[ico-sensiolabs]: https://img.shields.io/sensiolabs/i/ddd29a82-48bb-4fdd-a71d-98a3c00abd7c.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/middlewares/php-session
 [link-travis]: https://travis-ci.org/middlewares/php-session
 [link-scrutinizer]: https://scrutinizer-ci.com/g/middlewares/php-session
 [link-downloads]: https://packagist.org/packages/middlewares/php-session
-[link-sensiolabs]: https://insight.sensiolabs.com/projects/ddd29a82-48bb-4fdd-a71d-98a3c00abd7c
