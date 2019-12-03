@@ -41,7 +41,7 @@ This is a middleware to start the native PHP session using the cookies of the se
 
 ### name
 
-The session name. If it's not provided, use the php's default (PHPSESSID). More info [session_name](https://www.php.net/manual/en/function.session-name.php)
+The session name. If it's not provided, use the php's default name (PHPSESSID). More info [session_name](https://www.php.net/manual/en/function.session-name.php)
 
 ```php
 // Start the session with other name
@@ -50,7 +50,7 @@ $session = (new Middlewares\PhpSession())->name('user_session');
 
 ### id
 
-The session id. If it's not provided, try to get it from the request's cookies.
+This option set a session id. If it's not provided, use the request's cookies to get it.
 
 ```php
 // Start the session with a specific session id
@@ -59,7 +59,7 @@ $session = (new Middlewares\PhpSession())->id('foo');
 
 ### options
 
-Array of options passed to [`session_start()`](http://php.net/session_start)
+This allows to set an of options passed to [`session_start()`](http://php.net/session_start)
 
 ```php
 // Start the session with a specific session id
@@ -70,9 +70,7 @@ $session = (new Middlewares\PhpSession())->options([
 
 ### regenerateId
 
-The session id regeneration interval in seconds. If it's 0 or not provided, sesson ID will remain unchanged.
-
-The session id expiry timestamp key name.
+This option regenerates the id after a specific time interval. The latest regeneration time is saved in the key `session-id-expires` but you can change it in the second argument:
 
 ```php
 // Regenerate the session id after 60 seconds
