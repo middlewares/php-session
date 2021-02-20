@@ -21,19 +21,17 @@ class PhpSessionTest extends TestCase
         'cookie_domain' => 'domain.tld',
         'cookie_secure' => true,
         'cookie_httponly' => true,
-        'cookie_samesite' => 'Strict',
     ];
 
     private function getCookieHeader(string $sessionName, string $sessionId): string
     {
         return sprintf(
-            '%s=%s; expires=%s; path=%s; domain=%s; secure; httponly; SameSite=%s',
+            '%s=%s; expires=%s; path=%s; domain=%s; secure; httponly',
             urlencode($sessionName),
             urlencode($sessionId),
             $this->sessionOptions['cookie_path'],
             $this->sessionOptions['cookie_domain'],
-            gmdate('D, d M Y H:i:s T', $this->sessionOptions['cookie_lifetime']),
-            $this->sessionOptions['cookie_samesite'],
+            gmdate('D, d M Y H:i:s T', $this->sessionOptions['cookie_lifetime'])
         );
     }
 
