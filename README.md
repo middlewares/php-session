@@ -5,7 +5,7 @@
 ![Testing][ico-ga]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Middleware to start a [php session](http://php.net/manual/en/book.session.php) using the request data and close it after return the response.
+Middleware to start a [php session](http://php.net/manual/en/book.session.php) using the request data and close it after returning the response. Reads and writes session cookies in the PSR-7 request/response.
 
 ## Requirements
 

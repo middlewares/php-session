@@ -58,9 +58,13 @@ class PhpSession implements MiddlewareInterface
 
     /**
      * Set the session options.
+     *
+     * @throws RuntimeException
      */
     public function options(array $options): self
     {
+        self::checkSessionSettings($options);
+
         $this->options = $options;
 
         return $this;
@@ -83,23 +87,15 @@ class PhpSession implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        self::checkSessionSettings($this->options ?? []);
         self::checkSessionCanStart();
 
-        //Session name
+        // Session name
         $name = $this->name ?: session_name();
         session_name($name);
 
-        //Session id
-        $id = $this->id;
-
-        if (empty($id)) {
-            $cookies = $request->getCookieParams();
-
-            if (!empty($cookies[$name])) {
-                $id = $cookies[$name];
-            }
-        }
-
+        // Session ID
+        $id = $this->id ?: self::readSessionCookie($request, $name);
         if (!empty($id)) {
             session_id($id);
         }
@@ -110,16 +106,57 @@ class PhpSession implements MiddlewareInterface
             session_start($this->options);
         }
 
-        // Session Id regeneration
+        // Session ID regeneration
         self::runIdRegeneration($this->regenerateIdInterval, $this->sessionIdExpiryKey);
 
         $response = $handler->handle($request);
 
-        if ((session_status() === PHP_SESSION_ACTIVE) && (session_name() === $name)) {
+        if (session_status() === PHP_SESSION_ACTIVE && session_name() === $name) {
             session_write_close();
         }
 
+        // If the session ID changed, write the session cookie
+        if (session_id() !== $id) {
+            $response = self::writeSessionCookie(
+                $response,
+                session_name(),
+                session_id(),
+                time(),
+                session_get_cookie_params()
+            );
+        }
+
         return $response;
+    }
+
+    /**
+     * Check PHP session settings for compatibility with PSR-7.
+     *
+     * @throws RuntimeException
+     */
+    private static function checkSessionSettings(array $options): void
+    {
+        // See https://paul-m-jones.com/post/2016/04/12/psr-7-and-session-cookies
+        $use_trans_sid = $options['use_trans_sid'] ?? ini_get('session.use_trans_sid');
+        $use_cookies = $options['use_cookies'] ?? ini_get('session.use_cookies');
+        $use_only_cookies = $options['use_only_cookies'] ?? ini_get('session.use_only_cookies');
+        $cache_limiter = $options['cache_limiter'] ?? ini_get('session.cache_limiter');
+
+        if ($use_trans_sid != false) {
+            throw new RuntimeException('session.use_trans_sid must be false');
+        }
+
+        if ($use_cookies != false) {
+            throw new RuntimeException('session.use_cookies must be false');
+        }
+
+        if ($use_only_cookies != true) {
+            throw new RuntimeException('session.use_only_cookies must be true');
+        }
+
+        if ($cache_limiter !== '') {
+            throw new RuntimeException('session.cache_limiter must be set to an empty string');
+        }
     }
 
     /**
@@ -139,7 +176,7 @@ class PhpSession implements MiddlewareInterface
     }
 
     /**
-     * Regenerate the session id if it's needed
+     * Regenerate the session ID if it's needed.
      */
     private static function runIdRegeneration(int $interval = null, string $key = null): void
     {
@@ -158,5 +195,50 @@ class PhpSession implements MiddlewareInterface
 
             $_SESSION[$key] = $expiry;
         }
+    }
+
+    /**
+     * Attempt to read the session ID from the session cookie in a PSR-7 request.
+     */
+    private static function readSessionCookie(ServerRequestInterface $request, string $name): string
+    {
+        $cookies = $request->getCookieParams();
+        return $cookies[$name] ?? '';
+    }
+
+    /**
+     * Write a session cookie to the PSR-7 response.
+     */
+    private static function writeSessionCookie(
+        ResponseInterface $response,
+        string $name,
+        string $id,
+        int $now,
+        array $params
+    ): ResponseInterface {
+        $cookie = urlencode($name) . '=' . urlencode($id);
+
+        if (isset($params['lifetime'])) {
+            $expires = gmdate('D, d M Y H:i:s T', $now + $params['lifetime']);
+            $cookie .= "; expires={$expires}; max-age={$params['lifetime']}";
+        }
+
+        if (isset($params['domain'])) {
+            $cookie .= "; domain={$params['domain']}";
+        }
+
+        if (isset($params['path'])) {
+            $cookie .= "; path={$params['path']}";
+        }
+
+        if (isset($params['secure'])) {
+            $cookie .= '; secure';
+        }
+
+        if (isset($params['httponly'])) {
+            $cookie .= '; httponly';
+        }
+
+        return $response->withAddedHeader('Set-Cookie', $cookie);
     }
 }
