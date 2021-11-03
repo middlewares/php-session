@@ -223,19 +223,19 @@ class PhpSession implements MiddlewareInterface
             $cookie .= "; expires={$expires}; max-age={$params['lifetime']}";
         }
 
-        if (isset($params['domain'])) {
+        if (!empty($params['domain'])) {
             $cookie .= "; domain={$params['domain']}";
         }
 
-        if (isset($params['path'])) {
+        if (!empty($params['path'])) {
             $cookie .= "; path={$params['path']}";
         }
 
-        if (isset($params['secure'])) {
+        if (!empty($params['secure'])) {
             $cookie .= '; secure';
         }
 
-        if (isset($params['httponly'])) {
+        if (!empty($params['httponly'])) {
             $cookie .= '; httponly';
         }
 
