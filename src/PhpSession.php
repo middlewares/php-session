@@ -257,6 +257,6 @@ class PhpSession implements MiddlewareInterface
             $cookieAttributes['httponly'] = null;
         }
 
-        return $response->withAddedHeader('Set-Cookie', $this->joinCookieAttributes($cookieAttributes));
+        return $response->withAddedHeader('Set-Cookie', self::joinCookieAttributes($cookieAttributes));
     }
 }
