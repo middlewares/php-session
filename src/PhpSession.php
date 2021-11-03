@@ -218,25 +218,30 @@ class PhpSession implements MiddlewareInterface
     ): ResponseInterface {
         $cookie = urlencode($name) . '=' . urlencode($id);
 
-        if (isset($params['lifetime'])) {
+        // if omitted, the cookie will expire at end of the session (ie when the browser closes)
+        if (!empty($params['lifetime'])) {
             $expires = gmdate('D, d M Y H:i:s T', $now + $params['lifetime']);
-            $cookie .= "; expires={$expires}; max-age={$params['lifetime']}";
+            $cookie .= "; Expires={$expires}; Max-Age={$params['lifetime']}";
         }
 
         if (!empty($params['domain'])) {
-            $cookie .= "; domain={$params['domain']}";
+            $cookie .= "; Domain={$params['domain']}";
         }
 
         if (!empty($params['path'])) {
-            $cookie .= "; path={$params['path']}";
+            $cookie .= "; Path={$params['path']}";
+        }
+
+        if (!empty($params['samesite']) && in_array($params['samesite'], ['None', 'Lax', 'Strict'])) {
+            $cookie .= '; SameSite=' . $params['samesite'];
         }
 
         if (!empty($params['secure'])) {
-            $cookie .= '; secure';
+            $cookie .= '; Secure';
         }
 
         if (!empty($params['httponly'])) {
-            $cookie .= '; httponly';
+            $cookie .= '; HttpOnly';
         }
 
         return $response->withAddedHeader('Set-Cookie', $cookie);
