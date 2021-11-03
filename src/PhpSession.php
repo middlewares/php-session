@@ -35,7 +35,17 @@ class PhpSession implements MiddlewareInterface
      * @var string|null
      */
     private $sessionIdExpiryKey;
+    
+    /**
+     * @var boolean
+     */
+    private $autoDomain = true;
 
+    /**
+     * @var boolean
+     */
+    private $autoSecure = true;
+    
     /**
      * Configure the session name.
      */
@@ -81,6 +91,17 @@ class PhpSession implements MiddlewareInterface
 
         return $this;
     }
+    
+    /**
+     * Toggle auto domain and auto secure flag behaviour
+     */
+    public function auto(bool $domain = true, bool $secure = true): self
+    {
+        $this->autoDomain = $domain;
+        $this->autoSecure = $secure;
+
+        return $this;
+    }
 
     /**
      * Process a server request and return a response.
@@ -122,11 +143,27 @@ class PhpSession implements MiddlewareInterface
                 session_name(),
                 session_id(),
                 time(),
-                session_get_cookie_params()
+                $this->getCookieParams($request)
             );
         }
 
         return $response;
+    }
+    
+    private function getCookieParams(ServerRequestInterface $request): array
+    {
+        $cookieParams = session_get_cookie_params();
+        if ($this->autoDomain) {
+            if (empty($cookieParams['domain'])) {
+                $cookieParams['domain'] = $request->getUri()->getHost();
+            }
+        }
+        if ($this->autoSecure) {
+            if (empty($cookieParams['secure']) && $request->getUri()->getScheme() === 'https') {
+                $cookieParams['secure'] = true;
+            }
+        }
+        return $cookieParams;
     }
 
     /**
