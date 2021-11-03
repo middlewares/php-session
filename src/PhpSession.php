@@ -143,11 +143,7 @@ class PhpSession implements MiddlewareInterface
             session_id($id);
         }
 
-        $options = $this->options;
-        if ($this->isRememberMe($request)) {
-            $options["cookie_lifetime"] = $this->rememberMeLifetime;
-        }
-        session_start($options);
+        session_start($this->options);
 
         // Session ID regeneration
         self::runIdRegeneration($this->regenerateIdInterval, $this->sessionIdExpiryKey);
