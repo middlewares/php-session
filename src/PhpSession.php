@@ -207,6 +207,23 @@ class PhpSession implements MiddlewareInterface
     }
 
     /**
+     * Convert cookie attribute array to a single string.
+     */
+    private static function joinCookieAttributes(array $cookieAttributes): string
+    {
+        $cookie = [];
+        foreach ($cookieAttributes as $name => $value) {
+            if ($value === null) {
+                $cookie[] = $name;
+                continue;
+            }
+            $cookie[] = sprintf('%s=%s', $name, $value);
+        }
+
+        return implode('; ', $cookie);
+    }
+
+    /**
      * Write a session cookie to the PSR-7 response.
      */
     private static function writeSessionCookie(
@@ -216,29 +233,30 @@ class PhpSession implements MiddlewareInterface
         int $now,
         array $params
     ): ResponseInterface {
-        $cookie = urlencode($name) . '=' . urlencode($id);
+        $cookieAttributes = [urlencode($name) => urlencode($id)];
 
         if (isset($params['lifetime'])) {
             $expires = gmdate('D, d M Y H:i:s T', $now + $params['lifetime']);
-            $cookie .= "; expires={$expires}; max-age={$params['lifetime']}";
+            $cookieAttributes['expires'] = $expires;
+            $cookieAttributes['max-age'] = $params['lifetime'];
         }
 
         if (!empty($params['domain'])) {
-            $cookie .= "; domain={$params['domain']}";
+            $cookieAttributes['domain'] = $params['domain'];
         }
 
         if (!empty($params['path'])) {
-            $cookie .= "; path={$params['path']}";
+            $cookieAttributes['path'] => $params['path'];
         }
 
         if (!empty($params['secure'])) {
-            $cookie .= '; secure';
+            $cookieAttributes['secure'] = null;
         }
 
         if (!empty($params['httponly'])) {
-            $cookie .= '; httponly';
+            $cookieAttributes['httponly'] = null;
         }
 
-        return $response->withAddedHeader('Set-Cookie', $cookie);
+        return $response->withAddedHeader('Set-Cookie', $this->joinCookieAttributes($cookieAttributes));
     }
 }
