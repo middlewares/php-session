@@ -22,9 +22,9 @@ class PhpSession implements MiddlewareInterface
     private $id;
 
     /**
-     * @var array|null
+     * @var array
      */
-    private $options;
+    private $options = [];
 
     /**
      * @var int|null
@@ -45,6 +45,16 @@ class PhpSession implements MiddlewareInterface
      * @var boolean
      */
     private $autoSecure = true;
+
+    /**
+     * @var string
+     */
+    private $rememberMeField = '_remember_me';
+
+    /**
+     * @var int
+     */
+    private $rememberMeLifetime = 31536000;
     
     /**
      * Configure the session name.
@@ -102,13 +112,25 @@ class PhpSession implements MiddlewareInterface
 
         return $this;
     }
+    
+    /**
+     * Configure the remember me feature
+     */
+    public function rememberMe(int $lifetime, string $field = null): self
+    {
+        $this->rememberMeLifetime = $lifetime;
+        if ($field) {
+            $this->rememberMeField = $field;
+        }
+        return $this;
+    }
 
     /**
      * Process a server request and return a response.
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        self::checkSessionSettings($this->options ?? []);
+        self::checkSessionSettings($this->options);
         self::checkSessionCanStart();
 
         // Session name
@@ -121,11 +143,11 @@ class PhpSession implements MiddlewareInterface
             session_id($id);
         }
 
-        if ($this->options === null) {
-            session_start();
-        } else {
-            session_start($this->options);
+        $options = $this->options;
+        if ($this->isRememberMe($request)) {
+            $options["cookie_lifetime"] = $this->rememberMeLifetime;
         }
+        session_start($options);
 
         // Session ID regeneration
         self::runIdRegeneration($this->regenerateIdInterval, $this->sessionIdExpiryKey);
@@ -150,6 +172,11 @@ class PhpSession implements MiddlewareInterface
         return $response;
     }
     
+    private function isRememberMe(ServerRequestInterface $request): bool
+    {
+        return $request->getMethod() === "POST" && !empty($request->getParsedBody()[$this->rememberMeField]);
+    }
+
     private function getCookieParams(ServerRequestInterface $request): array
     {
         $cookieParams = session_get_cookie_params();
@@ -162,6 +189,9 @@ class PhpSession implements MiddlewareInterface
             if (empty($cookieParams['secure']) && $request->getUri()->getScheme() === 'https') {
                 $cookieParams['secure'] = true;
             }
+        }
+        if ($this->isRememberMe($request)) {
+            $cookieParams["lifetime"] = $this->rememberMeLifetime;
         }
         return $cookieParams;
     }
