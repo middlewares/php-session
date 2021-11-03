@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.1] - 2021-11-03
+### Fixed
+- Replace `isset` with `!empty` [#6]
+
 ## [3.0.0] - 2021-02-22
 ### Changed
 - This middleware handles the output session id cookie in the Psr7 response, instead send the cookie automaticaly by PHP. This requires the configuration `use_trans_sid`, `use_cookies` must be `false` and `use_only_cookies` as `true` [#4] [#5].
@@ -69,7 +73,9 @@ First version
 [#2]: https://github.com/middlewares/php-session/issues/2
 [#4]: https://github.com/middlewares/php-session/issues/4
 [#5]: https://github.com/middlewares/php-session/issues/5
+[#6]: https://github.com/middlewares/php-session/issues/6
 
+[3.0.1]: https://github.com/middlewares/php-session/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/middlewares/php-session/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/middlewares/php-session/compare/v1.2.0...v2.0.0
 [1.2.0]: https://github.com/middlewares/php-session/compare/v1.1.0...v1.2.0
