@@ -235,26 +235,27 @@ class PhpSession implements MiddlewareInterface
     ): ResponseInterface {
         $cookieAttributes = [urlencode($name) => urlencode($id)];
 
-        if (isset($params['lifetime'])) {
+        // if omitted, the cookie will expire at end of the session (ie when the browser closes)
+        if (!empty($params['lifetime'])) {
             $expires = gmdate('D, d M Y H:i:s T', $now + $params['lifetime']);
-            $cookieAttributes['expires'] = $expires;
-            $cookieAttributes['max-age'] = $params['lifetime'];
+            $cookieAttributes['Expires'] = $expires;
+            $cookieAttributes['Max-Age'] = $params['lifetime'];
         }
 
         if (!empty($params['domain'])) {
-            $cookieAttributes['domain'] = $params['domain'];
+            $cookieAttributes['Domain'] = $params['domain'];
         }
 
         if (!empty($params['path'])) {
-            $cookieAttributes['path'] => $params['path'];
+            $cookieAttributes['Path'] => $params['path'];
         }
 
         if (!empty($params['secure'])) {
-            $cookieAttributes['secure'] = null;
+            $cookieAttributes['Secure'] = null;
         }
 
         if (!empty($params['httponly'])) {
-            $cookieAttributes['httponly'] = null;
+            $cookieAttributes['HttpOnly'] = null;
         }
 
         return $response->withAddedHeader('Set-Cookie', self::joinCookieAttributes($cookieAttributes));
