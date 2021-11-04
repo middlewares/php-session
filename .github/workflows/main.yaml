@@ -74,3 +74,29 @@ jobs:
 
             - name: Tests coverage
               run: composer coverage
+
+    static-analysis:
+        name: Static Analysis
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - name: Install PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 7.4
+
+            - name: Cache PHP dependencies
+              uses: actions/cache@v2
+              with:
+                  path: vendor
+                  key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}
+                  restore-keys: ${{ runner.os }}-php-${{ matrix.php }}-composer-
+
+            - name: Install dependencies
+              run: composer install --prefer-dist --no-progress
+
+            - name: Static Analysis
+              run: composer run-script phpstan -- --level=5 src/ tests/
