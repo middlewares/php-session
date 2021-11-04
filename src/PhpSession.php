@@ -250,6 +250,10 @@ class PhpSession implements MiddlewareInterface
             $cookieAttributes['Path'] => $params['path'];
         }
 
+        if (!empty($params['samesite']) && in_array($params['samesite'], ['None', 'Lax', 'Strict'])) {
+            $cookieAttributes['SameSite'] => $params['samesite'];
+        }
+
         if (!empty($params['secure'])) {
             $cookieAttributes['Secure'] = null;
         }
