@@ -196,7 +196,7 @@ class PhpSessionTest extends TestCase
                         'use_strict_mode' => true,
                     ])),
 
-                function () use ($sessionId) {
+                function () {
                     echo session_id();
                 },
             ]
