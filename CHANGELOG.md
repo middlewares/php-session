@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.0] - 2021-11-05
+### Added
+- Support for `SameSite` [#9].
+
+### Fixed
+- Code improvements [#7], [#8].
+
 ## [3.0.1] - 2021-11-03
 ### Fixed
 - Replace `isset` with `!empty` [#6]
@@ -74,7 +81,11 @@ First version
 [#4]: https://github.com/middlewares/php-session/issues/4
 [#5]: https://github.com/middlewares/php-session/issues/5
 [#6]: https://github.com/middlewares/php-session/issues/6
+[#7]: https://github.com/middlewares/php-session/issues/7
+[#8]: https://github.com/middlewares/php-session/issues/8
+[#9]: https://github.com/middlewares/php-session/issues/9
 
+[3.1.0]: https://github.com/middlewares/php-session/compare/v3.0.1...v3.1.0
 [3.0.1]: https://github.com/middlewares/php-session/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/middlewares/php-session/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/middlewares/php-session/compare/v1.2.0...v2.0.0
