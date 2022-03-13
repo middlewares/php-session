@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.1] - 2022-03-13
+### Fixed
+- Get the session name from options if available and not explicity set [#14]
+
 ## [3.1.0] - 2021-11-05
 ### Added
 - Support for `SameSite` [#9].
@@ -74,7 +78,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Updated to `http-interop/http-middleware#0.3`
 
-## 0.1.0 - 2016-10-08
+## [0.1.0] - 2016-10-08
 First version
 
 [#2]: https://github.com/middlewares/php-session/issues/2
@@ -84,7 +88,9 @@ First version
 [#7]: https://github.com/middlewares/php-session/issues/7
 [#8]: https://github.com/middlewares/php-session/issues/8
 [#9]: https://github.com/middlewares/php-session/issues/9
+[#14]: https://github.com/middlewares/php-session/issues/14
 
+[3.1.1]: https://github.com/middlewares/php-session/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/middlewares/php-session/compare/v3.0.1...v3.1.0
 [3.0.1]: https://github.com/middlewares/php-session/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/middlewares/php-session/compare/v2.0.0...v3.0.0
@@ -97,3 +103,4 @@ First version
 [0.4.0]: https://github.com/middlewares/php-session/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/middlewares/php-session/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/middlewares/php-session/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/middlewares/php-session/releases/tag/v0.1.0
