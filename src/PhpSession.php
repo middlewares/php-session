@@ -91,7 +91,7 @@ class PhpSession implements MiddlewareInterface
         self::checkSessionCanStart();
 
         // Session name
-        $name = $this->name ?: session_name();
+        $name = $this->name ?? $this->options['name'] ?? session_name();
         session_name($name);
 
         // Session ID
