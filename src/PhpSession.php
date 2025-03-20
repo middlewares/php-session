@@ -22,7 +22,7 @@ class PhpSession implements MiddlewareInterface
     private $id;
 
     /**
-     * @var array|null
+     * @var array<int|bool|string|float>|null
      */
     private $options;
 
@@ -59,6 +59,7 @@ class PhpSession implements MiddlewareInterface
     /**
      * Set the session options.
      *
+     * @param  array<int|bool|string|float> $options
      * @throws RuntimeException
      */
     public function options(array $options): self
@@ -132,6 +133,7 @@ class PhpSession implements MiddlewareInterface
     /**
      * Check PHP session settings for compatibility with PSR-7.
      *
+     * @param  array<int|bool|string|float> $options
      * @throws RuntimeException
      */
     private static function checkSessionSettings(array $options): void
@@ -178,7 +180,7 @@ class PhpSession implements MiddlewareInterface
     /**
      * Regenerate the session ID if it's needed.
      */
-    private static function runIdRegeneration(int $interval = null, string $key = null): void
+    private static function runIdRegeneration(?int $interval = null, ?string $key = null): void
     {
         if (empty($interval)) {
             return;
@@ -203,11 +205,14 @@ class PhpSession implements MiddlewareInterface
     private static function readSessionCookie(ServerRequestInterface $request, string $name): string
     {
         $cookies = $request->getCookieParams();
+
         return $cookies[$name] ?? '';
     }
 
     /**
      * Write a session cookie to the PSR-7 response.
+     *
+     * @param array<bool|int|string> $params
      */
     private static function writeSessionCookie(
         ResponseInterface $response,

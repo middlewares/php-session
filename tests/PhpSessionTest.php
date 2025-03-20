@@ -10,6 +10,7 @@ use RuntimeException;
 
 class PhpSessionTest extends TestCase
 {
+    /** @var array<string,bool|string|int|float> */
     private $sessionOptions = [
         'use_strict_mode' => false,
         'use_trans_sid' => false,
@@ -23,18 +24,21 @@ class PhpSessionTest extends TestCase
         'cookie_httponly' => true,
     ];
 
-    private function getCookieHeader(string $sessionName, string $sessionId): string
-    {
-        return sprintf(
-            '%s=%s; expires=%s; path=%s; domain=%s; secure; httponly',
-            urlencode($sessionName),
-            urlencode($sessionId),
-            $this->sessionOptions['cookie_path'],
-            $this->sessionOptions['cookie_domain'],
-            gmdate('D, d M Y H:i:s T', $this->sessionOptions['cookie_lifetime'])
-        );
-    }
+    //    private function getCookieHeader(string $sessionName, string $sessionId): string
+    //    {
+    //        return sprintf(
+    //            '%s=%s; expires=%s; path=%s; domain=%s; secure; httponly',
+    //            urlencode($sessionName),
+    //            urlencode($sessionId),
+    //            $this->sessionOptions['cookie_path'],
+    //            $this->sessionOptions['cookie_domain'],
+    //            gmdate('D, d M Y H:i:s T', $this->sessionOptions['cookie_lifetime'])
+    //        );
+    //    }
 
+    /**
+     * @return array<array<string|int>>
+     */
     public function sessionDataProvider(): array
     {
         return [
@@ -50,7 +54,7 @@ class PhpSessionTest extends TestCase
         ];
     }
 
-    public function testCheckUseTransSidSettingException()
+    public function testCheckUseTransSidSettingException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('session.use_trans_sid must be false');
@@ -60,7 +64,7 @@ class PhpSessionTest extends TestCase
         ]);
     }
 
-    public function testCheckUseCookiesSettingException()
+    public function testCheckUseCookiesSettingException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('session.use_cookies must be false');
@@ -71,7 +75,7 @@ class PhpSessionTest extends TestCase
         ]);
     }
 
-    public function testCheckUseOnlyCookiesSettingException()
+    public function testCheckUseOnlyCookiesSettingException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('session.use_only_cookies must be true');
@@ -83,7 +87,7 @@ class PhpSessionTest extends TestCase
         ]);
     }
 
-    public function testCheckCacheLimiterSettingException()
+    public function testCheckCacheLimiterSettingException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('session.cache_limiter must be set to an empty string');
@@ -99,7 +103,7 @@ class PhpSessionTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testDefaultSettingCheck()
+    public function testDefaultSettingCheck(): void
     {
         ini_set('session.use_trans_sid', '0');
         ini_set('session.use_cookies', '0');
@@ -112,7 +116,7 @@ class PhpSessionTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testWriteSessionCookie()
+    public function testWriteSessionCookie(): void
     {
         $response = Dispatcher::run(
             [
@@ -132,7 +136,7 @@ class PhpSessionTest extends TestCase
      * @runInSeparateProcess
      * @dataProvider sessionDataProvider
      */
-    public function testPhpSession(string $sessionName, string $sessionId, string $value)
+    public function testPhpSession(string $sessionName, string $sessionId, string $value): void
     {
         $response = Dispatcher::run(
             [
@@ -157,7 +161,7 @@ class PhpSessionTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testRegenerateId()
+    public function testRegenerateId(): void
     {
         $sessionId = session_create_id();
 
@@ -184,7 +188,7 @@ class PhpSessionTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testStrictMode()
+    public function testStrictMode(): void
     {
         $sessionId = session_create_id();
 
