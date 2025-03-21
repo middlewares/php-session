@@ -93,10 +93,10 @@ class PhpSession implements MiddlewareInterface
 
         // Session name
         $name = $this->name ?? $this->options['name'] ?? session_name();
-        session_name($name);
+        session_name((string) $name);
 
         // Session ID
-        $id = $this->id ?: self::readSessionCookie($request, $name);
+        $id = $this->id ?: self::readSessionCookie($request, (string) $name);
         if (!empty($id)) {
             session_id($id);
         }
@@ -120,8 +120,8 @@ class PhpSession implements MiddlewareInterface
         if (session_id() !== $id) {
             $response = self::writeSessionCookie(
                 $response,
-                session_name(),
-                session_id(),
+                (string) session_name(),
+                (string) session_id(),
                 time(),
                 session_get_cookie_params()
             );
@@ -225,6 +225,7 @@ class PhpSession implements MiddlewareInterface
 
         // if omitted, the cookie will expire at end of the session (ie when the browser closes)
         if (!empty($params['lifetime'])) {
+            // @phpstan-ignore-next-line
             $expires = gmdate('D, d M Y H:i:s T', $now + $params['lifetime']);
             $cookie .= "; Expires={$expires}; Max-Age={$params['lifetime']}";
         }

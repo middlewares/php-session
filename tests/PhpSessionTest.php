@@ -37,7 +37,7 @@ class PhpSessionTest extends TestCase
     //    }
 
     /**
-     * @return array<array<string|int>>
+     * @return array<int, array<int, bool|string>>
      */
     public function sessionDataProvider(): array
     {
@@ -168,7 +168,7 @@ class PhpSessionTest extends TestCase
         $response = Dispatcher::run(
             [
                 (new PhpSession())
-                    ->id($sessionId)
+                    ->id((string) $sessionId)
                     ->regenerateId(-10)
                     ->options($this->sessionOptions),
 
@@ -195,7 +195,7 @@ class PhpSessionTest extends TestCase
         $response = Dispatcher::run(
             [
                 (new PhpSession())
-                    ->id($sessionId)
+                    ->id((string) $sessionId)
                     ->options(array_merge($this->sessionOptions, [
                         'use_strict_mode' => true,
                     ])),
