@@ -22,9 +22,14 @@ class PhpSession implements MiddlewareInterface
     private $id;
 
     /**
-     * @var array<int|bool|string|float>|null
+     * @var array<string,bool|float|int|string>|null
      */
-    private $options;
+    private $sessionOptions;
+
+    /**
+     * @var array<string,bool|float|int|string>|null
+     */
+    private $cookieOptions;
 
     /**
      * @var int|null
@@ -57,7 +62,7 @@ class PhpSession implements MiddlewareInterface
     }
 
     /**
-     * Set the session options.
+     * Set the session and cookie options.
      *
      * @param  array<int|bool|string|float> $options
      * @throws RuntimeException
@@ -66,9 +71,31 @@ class PhpSession implements MiddlewareInterface
     {
         self::checkSessionSettings($options);
 
-        $this->options = $options;
+        $this->sessionOptions = $options;
+        $this->cookieOptions = [];
+
+        static::moveKeys(
+            ['lifetime', 'path', 'domain', 'secure', 'httponly', 'samesite'],
+            $this->sessionOptions,
+            $this->cookieOptions
+        );
 
         return $this;
+    }
+
+    /**
+     * @param string[]                            $keysToMove
+     * @param array<string,bool|float|int|string> $source
+     * @param array<string,bool|float|int|string> $target
+     */
+    private static function moveKeys(array $keysToMove, array &$source, array &$target): void
+    {
+        foreach ($keysToMove as $key) {
+            if (array_key_exists($key, $source)) {
+                $target[$key] = $source[$key];
+                unset($source[$key]);
+            }
+        }
     }
 
     /**
@@ -88,11 +115,11 @@ class PhpSession implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        self::checkSessionSettings($this->options ?? []);
+        self::checkSessionSettings($this->sessionOptions ?? []);
         self::checkSessionCanStart();
 
         // Session name
-        $name = $this->name ?? $this->options['name'] ?? session_name();
+        $name = $this->name ?? $this->sessionOptions['name'] ?? session_name();
         session_name((string) $name);
 
         // Session ID
@@ -101,10 +128,10 @@ class PhpSession implements MiddlewareInterface
             session_id($id);
         }
 
-        if ($this->options === null) {
+        if ($this->sessionOptions === null) {
             session_start();
         } else {
-            session_start($this->options);
+            session_start($this->sessionOptions);
         }
 
         // Session ID regeneration
@@ -123,7 +150,7 @@ class PhpSession implements MiddlewareInterface
                 (string) session_name(),
                 (string) session_id(),
                 time(),
-                session_get_cookie_params()
+                array_merge(session_get_cookie_params(), $this->cookieOptions)
             );
         }
 

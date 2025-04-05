@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.3.0] - 2025-03-21
+### Added
+
+Extended `options()` functionality so that cookie parameters can be passed from now on. Before that you could only set them with `session_set_cookie_params()`.
+
+Its important to mention that `options()` will have preference over `session_set_cookie_params()`.
+
+Example:
+
+```phpDispatcher::run(
+    [
+        (new PhpSession())->options([
+            // session params, as usual
+            'use_cookies' => false,
+            'cache_limiter' => '',
+
+            // new cookie params
+            'lifetime' => 10,
+            'path' => '/middlewares',
+            'domain' => 'middlewares.dev',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict',
+        ]),
+    ]
+);
+```
+
+This implements the required functionality to solve this request #12.
+
 ## [3.2.0] - 2025-03-21
 ### Added
 - Support for PHP 8.4
@@ -94,6 +124,7 @@ First version
 [#9]: https://github.com/middlewares/php-session/issues/9
 [#14]: https://github.com/middlewares/php-session/issues/14
 
+[3.3.0]: https://github.com/middlewares/php-session/compare/v3.2.0...v3.3.0
 [3.2.0]: https://github.com/middlewares/php-session/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/middlewares/php-session/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/middlewares/php-session/compare/v3.0.1...v3.1.0

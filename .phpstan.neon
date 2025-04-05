@@ -8,3 +8,4 @@ parameters:
         - "#static#"
         - "#session_set_cookie_params#"
         - "#int<70200, 70399> and 70200#"
+        - "#function array_merge expects array#"

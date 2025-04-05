@@ -134,32 +134,63 @@ class PhpSessionTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testSessionParamsAreConsidered(): void
+    public function testCookieParamsAreConsidered(): void
     {
-        if (PHP_VERSION_ID >= 70400) {
-            session_set_cookie_params([
-                'lifetime' => 10,
-                'path' => '/middlewares',
-                'domain' => 'middlewares.dev',
-                'secure' => '',
-                'httponly' => '',
-                'samesite' => 'Strict',
-            ]);
-        } elseif (PHP_VERSION_ID >= 70200) {
-            session_set_cookie_params(
-                10,
-                '/middlewares',
-                'middlewares.dev',
-                false,
-                false
-            );
-        }
+        $response = Dispatcher::run(
+            [
+                (new PhpSession())->options([
+                    // session params
+                    'use_cookies' => false,
+                    'cache_limiter' => '',
+
+                    // cookie params
+                    'lifetime' => 10,
+                    'path' => '/middlewares',
+                    'domain' => 'middlewares.dev',
+                    'secure' => '',
+                    'httponly' => '',
+                    'samesite' => 'Strict',
+                ]),
+            ]
+        );
+
+        $this->assertTrue($response->hasHeader('Set-Cookie'));
+
+        $cookie = $response->getHeaderLine('Set-Cookie');
+        $parsed = static::parseCookie($cookie);
+
+        $this->assertEquals('Strict', $parsed['SameSite']);
+        $this->assertEquals('middlewares.dev', $parsed['Domain']);
+        $this->assertEquals('/middlewares', $parsed['Path']);
+        $this->assertArrayNotHasKey('HttpOnly', $parsed);
+        $this->assertArrayNotHasKey('Secure', $parsed);
+        $this->assertArrayHasKey('Expires', $parsed);
+        $this->assertArrayHasKey('PHPSESSID', $parsed);
+        $this->assertEquals('10', $parsed['Max-Age']);
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testCookieParamsOptionOverwritePhpCookieParamsAreConsidered(): void
+    {
+        // these are ignored
+        static::setPhpCookieParams();
 
         $response = Dispatcher::run(
             [
                 (new PhpSession())->options([
+                    // session params
                     'use_cookies' => false,
                     'cache_limiter' => '',
+
+                    // cookie params
+                    'lifetime' => 10,
+                    'path' => '/middlewares',
+                    'domain' => 'middlewares.dev',
+                    'secure' => true,
+                    'httponly' => true,
+                    'samesite' => 'Strict',
                 ]),
             ]
         );
@@ -175,11 +206,47 @@ class PhpSessionTest extends TestCase
 
         $this->assertEquals('middlewares.dev', $parsed['Domain']);
         $this->assertEquals('/middlewares', $parsed['Path']);
+        $this->assertEquals(true, $parsed['HttpOnly']);
+        $this->assertEquals(true, $parsed['Secure']);
+        $this->assertArrayHasKey('Expires', $parsed);
+        $this->assertArrayHasKey('PHPSESSID', $parsed);
+        $this->assertEquals('10', $parsed['Max-Age']);
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testPhpCookieParamsAreConsideredIfCookieParamsAreNotSpecified(): void
+    {
+        // these are taken into account now
+        static::setPhpCookieParams();
+
+        $response = Dispatcher::run(
+            [
+                (new PhpSession())->options([
+                    // session params
+                    'use_cookies' => false,
+                    'cache_limiter' => '',
+                ]),
+            ]
+        );
+
+        $this->assertTrue($response->hasHeader('Set-Cookie'));
+
+        $cookie = $response->getHeaderLine('Set-Cookie');
+        $parsed = static::parseCookie($cookie);
+
+        if (PHP_VERSION_ID >= 70400) {
+            $this->assertEquals('Strict', $parsed['SameSite']);
+        }
+
+        $this->assertEquals('wild.dev', $parsed['Domain']);
+        $this->assertEquals('/wild', $parsed['Path']);
         $this->assertArrayNotHasKey('HttpOnly', $parsed);
         $this->assertArrayNotHasKey('Secure', $parsed);
         $this->assertArrayHasKey('Expires', $parsed);
         $this->assertArrayHasKey('PHPSESSID', $parsed);
-        $this->assertEquals('10', $parsed['Max-Age']);
+        $this->assertEquals('99', $parsed['Max-Age']);
     }
 
     /**
@@ -280,5 +347,27 @@ class PhpSessionTest extends TestCase
         }
 
         return $cookie;
+    }
+
+    private static function setPhpCookieParams(): void
+    {
+        if (PHP_VERSION_ID >= 70400) {
+            session_set_cookie_params([
+                'lifetime' => 99,
+                'path' => '/wild',
+                'domain' => 'wild.dev',
+                'secure' => '',
+                'httponly' => '',
+                'samesite' => 'Strict',
+            ]);
+        } elseif (PHP_VERSION_ID >= 70200) {
+            session_set_cookie_params(
+                99,
+                '/wild',
+                'wild.dev',
+                false,
+                false
+            );
+        }
     }
 }
