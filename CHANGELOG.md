@@ -14,26 +14,24 @@ Its important to mention that `options()` will have preference over `session_set
 
 Example:
 
-```phpDispatcher::run(
-    [
-        (new PhpSession())->options([
-            // session params, as usual
-            'use_cookies' => false,
-            'cache_limiter' => '',
+```php
+Dispatcher::run([
+    (new PhpSession())->options([
+        // session params, as usual
+        'use_cookies' => false,
+        'cache_limiter' => '',
 
-            // new cookie params
-            'lifetime' => 10,
-            'path' => '/middlewares',
-            'domain' => 'middlewares.dev',
-            'secure' => true,
-            'httponly' => true,
-            'samesite' => 'Strict',
-        ]),
-    ]
+        // new cookie params functionality
+        'lifetime' => 10,
+        'path' => '/middlewares',
+        'domain' => 'middlewares.dev',
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'Strict',
+    ]),
+]
 );
 ```
-
-This implements the required functionality to solve this request #12.
 
 ## [3.2.0] - 2025-03-21
 ### Added
