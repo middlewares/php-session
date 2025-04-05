@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [3.3.0] - 2025-03-21
+## [3.3.0] - 2025-04-05
 ### Added
 
 Extended `options()` functionality so that cookie parameters can be passed from now on. Before that you could only set them with `session_set_cookie_params()`.
